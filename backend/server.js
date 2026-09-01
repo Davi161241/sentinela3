@@ -34,14 +34,14 @@ path.join(__dirname, "uploads");
 
 if (!fs.existsSync(uploadsPath)) {
 
-```
+
 fs.mkdirSync(
     uploadsPath,
     {
         recursive: true
     }
 );
-```
+
 
 }
 
@@ -50,7 +50,7 @@ fs.mkdirSync(
 const storage =
 multer.diskStorage({
 
-```
+
     destination: function (req, file, cb) {
 
         cb(
@@ -83,7 +83,7 @@ multer.diskStorage({
     }
 
 });
-```
+
 
 const upload =
 multer({
@@ -113,7 +113,7 @@ __dirname,
 
 function readDB() {
 
-```
+
 if (!fs.existsSync(DB_FILE)) {
 
     return {
@@ -172,7 +172,7 @@ if (!Array.isArray(db.tv_historico)) {
 
 
 return db;
-```
+
 
 }
 
@@ -182,7 +182,7 @@ return db;
 
 function writeDB(data) {
 
-```
+
 fs.writeFileSync(
 
     DB_FILE,
@@ -196,7 +196,7 @@ fs.writeFileSync(
     "utf8"
 
 );
-```
+
 
 }
 
@@ -208,7 +208,7 @@ app.post(
 "/login",
 (req, res) => {
 
-```
+
     try {
 
         const db =
@@ -277,7 +277,7 @@ app.post(
     }
 
 }
-```
+
 
 );
 
@@ -291,7 +291,7 @@ app.post(
 upload.single("foto"),
 (req, res) => {
 
-```
+
     try {
 
         console.log(
@@ -451,7 +451,7 @@ upload.single("foto"),
     }
 
 }
-```
+
 
 );
 
@@ -463,7 +463,7 @@ app.get(
 "/pacientes",
 (req, res) => {
 
-```
+
     try {
 
         const db =
@@ -489,7 +489,7 @@ app.get(
     }
 
 }
-```
+
 
 );
 
@@ -501,7 +501,7 @@ app.post(
 "/triagem",
 (req, res) => {
 
-```
+
     try {
 
         const db =
@@ -616,7 +616,7 @@ app.post(
     }
 
 }
-```
+
 
 );
 
@@ -628,7 +628,7 @@ app.get(
 "/triagens",
 (req, res) => {
 
-```
+
     try {
 
         const db =
@@ -654,7 +654,7 @@ app.get(
     }
 
 }
-```
+
 
 );
 
@@ -666,7 +666,7 @@ app.post(
 "/tv/chamar",
 (req, res) => {
 
-```
+
     try {
 
         const db =
@@ -747,7 +747,7 @@ app.post(
     }
 
 }
-```
+
 
 );
 
@@ -759,7 +759,7 @@ app.get(
 "/tv/chamada",
 (req, res) => {
 
-```
+
     try {
 
         const db =
@@ -791,7 +791,7 @@ app.get(
     }
 
 }
-```
+
 
 );
 
@@ -803,7 +803,7 @@ app.get(
 "/lista-medicacoes",
 (req, res) => {
 
-```
+
     res.json([
 
         "Dipirona",
@@ -829,7 +829,7 @@ app.get(
     ]);
 
 }
-```
+
 
 );
 
@@ -841,7 +841,7 @@ app.post(
 "/consulta",
 (req, res) => {
 
-```
+
     try {
 
         const db =
@@ -915,7 +915,7 @@ app.post(
     }
 
 }
-```
+
 
 );
 
@@ -927,7 +927,7 @@ app.get(
 "/medicacoes",
 (req, res) => {
 
-```
+
     try {
 
         const db =
@@ -953,7 +953,7 @@ app.get(
     }
 
 }
-```
+
 
 );
 
@@ -965,7 +965,7 @@ app.get(
 "/",
 (req, res) => {
 
-```
+
     res.sendFile(
         path.join(
             __dirname,
@@ -974,7 +974,7 @@ app.get(
     );
 
 }
-```
+
 
 );
 
@@ -990,12 +990,12 @@ PORT,
 "0.0.0.0",
 () => {
 
-```
+
     console.log(
-        `🚀 Servidor rodando na porta ${PORT}`
+        🚀 Servidor rodando na porta ${PORT}
     );
 
 }
-```
+
 
 );
