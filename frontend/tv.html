@@ -1,0 +1,490 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mídia Indoor - TV</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(
+        135deg,
+        #f4f8fb 0%,
+        #eaf2f7 100%
+      );
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      width: 100vw;
+      height: 100vh;
+
+      overflow: hidden;
+
+      color: #1f2d3d;
+    }
+
+    /* =========================================
+       CONTAINER PRINCIPAL
+    ========================================= */
+
+    .tv-container {
+      display: flex;
+
+      width: 94vw;
+      height: 88vh;
+
+      max-width: 1500px;
+
+      gap: 16px;
+    }
+
+
+    /* =========================================
+       PAINEL ESQUERDO
+    ========================================= */
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+
+      width: 32%;
+
+      gap: 16px;
+    }
+
+
+    /* =========================================
+       PAINEL DIREITO
+    ========================================= */
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+
+      width: 68%;
+
+      gap: 16px;
+    }
+
+
+    /* =========================================
+       BOXES
+    ========================================= */
+
+    .box {
+      background: rgba(255, 255, 255, 0.96);
+
+      border: 1px solid #cbdfea;
+
+      border-radius: 15px;
+
+      padding: 22px;
+
+      display: flex;
+      flex-direction: column;
+
+      justify-content: center;
+      align-items: center;
+
+      text-align: center;
+
+      box-shadow:
+        0 8px 24px rgba(30, 70, 90, 0.08),
+        0 2px 7px rgba(30, 70, 90, 0.05);
+    }
+
+
+    /* =========================================
+       TÍTULOS
+    ========================================= */
+
+    .box-title {
+      color: #173b57;
+
+      font-size: 2.1vw;
+
+      font-weight: 700;
+
+      text-transform: uppercase;
+
+      text-shadow: none;
+
+      margin-bottom: 10px;
+    }
+
+
+    /* =========================================
+       LOCAL / CONSULTÓRIO
+    ========================================= */
+
+    .local-box {
+      flex: 0 0 39%;
+    }
+
+    .local-number {
+      color: #d12c2c;
+
+      font-size: 7.5vw;
+
+      font-weight: 700;
+
+      line-height: 1;
+    }
+
+    .local-type {
+      color: #36566b;
+
+      font-size: 1.8vw;
+
+      font-weight: 600;
+
+      margin-top: 6px;
+    }
+
+
+    /* =========================================
+       HISTÓRICO
+    ========================================= */
+
+    .history-box {
+      flex: 1;
+
+      justify-content: flex-start;
+
+      align-items: flex-start;
+
+      padding: 24px;
+    }
+
+    .history-box .box-title {
+      font-size: 1.75vw;
+
+      align-self: center;
+
+      margin-bottom: 20px;
+    }
+
+    #history-list {
+      list-style: none;
+
+      width: 100%;
+
+      color: #d12c2c;
+
+      font-size: 1.45vw;
+
+      font-weight: 600;
+
+      text-align: left;
+    }
+
+    #history-list li {
+      margin-bottom: 0;
+
+      padding: 9px 2px;
+
+      border-bottom: 1px solid #dce7ed;
+    }
+
+
+    /* =========================================
+       PAINEL DO PACIENTE
+    ========================================= */
+
+    .patient-box {
+      flex: 3;
+
+      padding: 25px;
+    }
+
+    .patient-box .box-title {
+      font-size: 2vw;
+
+      margin-bottom: 18px;
+    }
+
+    .patient-name {
+      color: #d12c2c;
+
+      font-size: 6vw;
+
+      font-weight: 700;
+
+      line-height: 1.15;
+
+      word-break: break-word;
+    }
+
+
+    /* =========================================
+       LOGO
+    ========================================= */
+
+    .logo-box {
+      flex: 1;
+
+      position: relative;
+
+      display: flex;
+
+      flex-direction: row;
+
+      justify-content: center;
+
+      align-items: center;
+
+      gap: 35px;
+
+      overflow: hidden;
+
+      padding: 15px 35px;
+    }
+
+    .logo-image {
+      width: 30%;
+      height: 90%;
+
+      object-fit: contain;
+
+      object-position: center;
+
+      display: block;
+    }
+
+    .logo-text {
+      color: #173b57;
+
+      font-size: 3vw;
+
+      font-weight: 700;
+
+      text-transform: uppercase;
+
+      letter-spacing: 2px;
+    }
+
+
+    /* =========================================
+       FLASH DA CHAMADA
+    ========================================= */
+
+    @keyframes flash {
+      0%, 100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .flash {
+      animation: flash 0.5s ease 3;
+    }
+
+
+    /* =========================================
+       RESPONSIVIDADE
+    ========================================= */
+
+    @media (max-width: 900px) {
+
+      .tv-container {
+        width: 96vw;
+        height: 92vh;
+
+        gap: 12px;
+      }
+
+      .left-panel,
+      .right-panel {
+        gap: 12px;
+      }
+
+      .box {
+        border-radius: 12px;
+
+        padding: 16px;
+      }
+
+      .box-title {
+        font-size: 2.5vw;
+      }
+
+      .local-number {
+        font-size: 8vw;
+      }
+
+      .patient-name {
+        font-size: 6.5vw;
+      }
+
+      .logo-box {
+        gap: 20px;
+      }
+
+      .logo-text {
+        font-size: 2.5vw;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- Estrutura da tela da TV criada para exibir o local e o nome do paciente -->
+
+<div class="tv-container">
+
+  <div class="left-panel">
+
+    <div class="box local-box">
+
+      <div class="box-title" id="local-tipo">
+        GUICHÊ
+      </div>
+
+      <div class="local-number" id="local-numero">
+        --
+      </div>
+
+    </div>
+
+
+    <div class="box history-box">
+
+      <div class="box-title">
+        ÚLTIMAS CHAMADAS
+      </div>
+
+      <ul id="history-list"></ul>
+
+    </div>
+
+  </div>
+
+
+  <div class="right-panel">
+
+    <div class="box patient-box">
+
+      <div class="box-title">
+        PACIENTE
+      </div>
+
+      <div class="patient-name" id="patient-name">
+        AGUARDANDO...
+      </div>
+
+    </div>
+
+
+    <div class="box logo-box">
+
+      <!-- Logo do hospital -->
+
+      <img
+        src="../logo.png"
+        alt="Logo do Hospital"
+        class="logo-image"
+      >
+
+      <div class="logo-text">
+        🏥 Sistema Hospitalar
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+let ultimoId = null;
+
+// Função criada para buscar a chamada atual e o histórico da TV em tempo real.
+function atualizar() {
+  fetch("/tv/chamada")
+    .then(r => r.json())
+    .then(data => {
+      const chamada = data.chamada;
+      const historico = data.historico || [];
+
+      if (chamada) {
+        document.getElementById("local-tipo").innerText =
+          chamada.localTipo || "GUICHÊ";
+
+        document.getElementById("local-numero").innerText =
+          chamada.localNumero || "--";
+
+        document.getElementById("patient-name").innerText =
+          chamada.paciente || "AGUARDANDO...";
+
+
+        // Flash visual quando há chamada nova
+        if (chamada.id !== ultimoId) {
+
+          ultimoId = chamada.id;
+
+          const patientBox =
+            document.querySelector(".patient-box");
+
+          patientBox.classList.remove("flash");
+
+          void patientBox.offsetWidth;
+
+          patientBox.classList.add("flash");
+        }
+      }
+
+
+      // Histórico
+      const list =
+        document.getElementById("history-list");
+
+      list.innerHTML = "";
+
+
+      historico.slice(0, 4).forEach(h => {
+
+        const li =
+          document.createElement("li");
+
+        const tipo =
+          h.localTipo
+            ? h.localTipo.substring(0,4)
+            : "GUIC";
+
+        li.innerText =
+          `${tipo}. ${h.localNumero} - ${h.paciente}`;
+
+        list.appendChild(li);
+      });
+
+    })
+    .catch(err =>
+      console.log("Erro ao buscar chamada:", err)
+    );
+}
+
+
+// Polling a cada 2 segundos
+atualizar();
+
+setInterval(atualizar, 2000);
+</script>
+
+</body>
+</html>
+```

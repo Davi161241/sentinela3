@@ -1,0 +1,411 @@
+/* =========================================
+   SISTEMA HOSPITALAR — ESTILO FUTURISTA
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #f4f8fb 0%, #eaf2f7 100%);
+    color: #1f2d3d;
+    margin: 0;
+    min-height: 100vh;
+}
+
+
+/* =========================================
+   CONTAINER PRINCIPAL
+========================================= */
+
+.container {
+    width: 92%;
+    max-width: 1000px;
+    margin: 35px auto;
+    background: rgba(255, 255, 255, 0.96);
+    padding: 30px;
+    border-radius: 18px;
+
+    border: 1px solid #dce8ef;
+
+    box-shadow:
+        0 10px 30px rgba(30, 70, 90, 0.08),
+        0 2px 8px rgba(30, 70, 90, 0.05);
+
+    position: relative;
+}
+
+
+/* =========================================
+   TÍTULOS
+========================================= */
+
+h1,
+h2,
+h3 {
+    color: #173b57;
+    margin-top: 0;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    border-left: 5px solid #198fd1;
+    padding-left: 14px;
+}
+
+h2 {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+
+/* =========================================
+   INPUTS / SELECT / TEXTAREA
+========================================= */
+
+input,
+select,
+textarea,
+button {
+    width: 100%;
+    padding: 13px 15px;
+    margin-top: 10px;
+
+    border-radius: 10px;
+    border: 1px solid #cfdde6;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+input,
+select,
+textarea {
+    background: #fbfdfe;
+    color: #263746;
+}
+
+
+/* Foco nos campos */
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+
+    border-color: #198fd1;
+
+    box-shadow:
+        0 0 0 3px rgba(25, 143, 209, 0.12),
+        0 4px 12px rgba(25, 143, 209, 0.08);
+
+    background: #ffffff;
+}
+
+
+/* =========================================
+   TEXTAREA
+========================================= */
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+
+/* =========================================
+   BOTÕES
+========================================= */
+
+button {
+    background: linear-gradient(
+        135deg,
+        #198fd1,
+        #126fa8
+    );
+
+    color: #ffffff;
+
+    border: none;
+
+    font-weight: 600;
+    letter-spacing: 0.2px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 14px rgba(25, 143, 209, 0.20);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+button:hover {
+    background: linear-gradient(
+        135deg,
+        #157fbd,
+        #0e608f
+    );
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(25, 143, 209, 0.28);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================
+   CARDS
+========================================= */
+
+.card {
+    border: 1px solid #dce7ed;
+
+    padding: 20px;
+    margin: 18px 0;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 5px 16px rgba(30, 70, 90, 0.07);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+
+    border-color: #c7dce8;
+
+    box-shadow:
+        0 8px 22px rgba(30, 70, 90, 0.10);
+}
+
+
+/* =========================================
+   STATUS — VERDE
+   Paciente estável / concluído / disponível
+========================================= */
+
+.verde {
+    display: inline-block;
+
+    background: #e5f7ef;
+    color: #168653;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    border: 1px solid #bcebd4;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   STATUS — AMARELO
+   Atenção / aguardando
+========================================= */
+
+.amarelo {
+    display: inline-block;
+
+    background: #fff7d9;
+    color: #9a7100;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    border: 1px solid #f1dfa0;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   STATUS — VERMELHO
+   Urgência / alerta / crítico
+========================================= */
+
+.vermelho {
+    display: inline-block;
+
+    background: #ffe8e8;
+    color: #c62828;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    border: 1px solid #f3bcbc;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   ELEMENTOS DE DESTAQUE
+========================================= */
+
+.info {
+    background: #e8f5fc;
+    color: #126b9d;
+
+    border-left: 4px solid #198fd1;
+
+    padding: 12px 15px;
+
+    border-radius: 8px;
+
+    margin: 15px 0;
+}
+
+
+/* =========================================
+   ALERTA HOSPITALAR
+========================================= */
+
+.alerta {
+    background: #fff0f0;
+    color: #b32626;
+
+    border-left: 4px solid #d93030;
+
+    padding: 12px 15px;
+
+    border-radius: 8px;
+
+    margin: 15px 0;
+}
+
+
+/* =========================================
+   SUCESSO
+========================================= */
+
+.sucesso {
+    background: #ebfaf3;
+    color: #147a4b;
+
+    border-left: 4px solid #20a968;
+
+    padding: 12px 15px;
+
+    border-radius: 8px;
+
+    margin: 15px 0;
+}
+
+
+/* =========================================
+   LINHAS / DIVISORES
+========================================= */
+
+hr {
+    border: none;
+
+    height: 1px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #d7e3ea,
+        transparent
+    );
+
+    margin: 25px 0;
+}
+
+
+/* =========================================
+   LABELS
+========================================= */
+
+label {
+    display: block;
+
+    margin-top: 15px;
+
+    color: #36566b;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+::-webkit-scrollbar {
+    width: 9px;
+}
+
+::-webkit-scrollbar-track {
+    background: #edf3f6;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #b9cdd9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #198fd1;
+}
+
+
+/* =========================================
+   RESPONSIVIDADE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .container {
+        width: 94%;
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 14px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+}

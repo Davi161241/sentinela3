@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Sistema Hospitalar</title>
+
+<style>
+    /* =========================================
+       SISTEMA HOSPITALAR — ESTILO FUTURISTA
+    ========================================= */
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Segoe UI", Arial, sans-serif;
+
+        background:
+            radial-gradient(circle at top left,
+                rgba(25, 143, 209, 0.10),
+                transparent 35%),
+            radial-gradient(circle at bottom right,
+                rgba(18, 111, 168, 0.08),
+                transparent 35%),
+            linear-gradient(135deg,
+                #f4f8fb 0%,
+                #eaf2f7 100%);
+
+        color: #1f2d3d;
+
+        margin: 0;
+        min-height: 100vh;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        padding: 20px;
+    }
+
+
+    /* =========================================
+       CONTAINER PRINCIPAL
+    ========================================= */
+
+    .container {
+        width: 100%;
+        max-width: 420px;
+
+        background: rgba(255, 255, 255, 0.97);
+
+        padding: 38px 35px;
+
+        border-radius: 20px;
+
+        border: 1px solid #dce8ef;
+
+        box-shadow:
+            0 20px 50px rgba(30, 70, 90, 0.12),
+            0 5px 15px rgba(30, 70, 90, 0.06);
+
+        position: relative;
+
+        animation: aparecer 0.5s ease;
+    }
+
+
+    /* =========================================
+       DETALHE SUPERIOR
+    ========================================= */
+
+    .container::before {
+        content: "";
+
+        position: absolute;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 4px;
+
+        border-radius: 20px 20px 0 0;
+
+        background: linear-gradient(
+            90deg,
+            #126fa8,
+            #198fd1,
+            #4bb8e8
+        );
+    }
+
+
+    /* =========================================
+       TÍTULO
+    ========================================= */
+
+    h2 {
+        color: #173b57;
+
+        text-align: center;
+
+        font-size: 25px;
+
+        font-weight: 700;
+
+        margin: 0 0 28px;
+
+        letter-spacing: 0.2px;
+    }
+
+
+    /* =========================================
+       ÍCONE DO HOSPITAL
+    ========================================= */
+
+    h2::first-letter {
+        font-size: 27px;
+    }
+
+
+    /* =========================================
+       INPUTS
+    ========================================= */
+
+    input {
+        width: 100%;
+
+        padding: 14px 15px;
+
+        margin-top: 12px;
+
+        border-radius: 10px;
+
+        border: 1px solid #cfdde6;
+
+        background: #fbfdfe;
+
+        color: #263746;
+
+        font-family: inherit;
+
+        font-size: 15px;
+
+        outline: none;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease,
+            transform 0.2s ease;
+    }
+
+
+    /* =========================================
+       PLACEHOLDER
+    ========================================= */
+
+    input::placeholder {
+        color: #8aa0ae;
+    }
+
+
+    /* =========================================
+       INPUT — FOCO
+    ========================================= */
+
+    input:focus {
+        border-color: #198fd1;
+
+        background: #ffffff;
+
+        box-shadow:
+            0 0 0 3px rgba(25, 143, 209, 0.12),
+            0 4px 12px rgba(25, 143, 209, 0.08);
+
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================
+       BOTÃO
+    ========================================= */
+
+    button {
+        width: 100%;
+
+        padding: 14px 15px;
+
+        margin-top: 18px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        background: linear-gradient(
+            135deg,
+            #198fd1,
+            #126fa8
+        );
+
+        color: #ffffff;
+
+        font-family: inherit;
+
+        font-size: 15px;
+
+        font-weight: 600;
+
+        letter-spacing: 0.3px;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 5px 14px rgba(25, 143, 209, 0.20);
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+    }
+
+
+    /* =========================================
+       BOTÃO — HOVER
+    ========================================= */
+
+    button:hover {
+        background: linear-gradient(
+            135deg,
+            #157fbd,
+            #0e608f
+        );
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 8px 20px rgba(25, 143, 209, 0.28);
+    }
+
+
+    /* =========================================
+       BOTÃO — CLIQUE
+    ========================================= */
+
+    button:active {
+        transform: translateY(0);
+
+        box-shadow:
+            0 4px 10px rgba(25, 143, 209, 0.18);
+    }
+
+
+    /* =========================================
+       ANIMAÇÃO
+    ========================================= */
+
+    @keyframes aparecer {
+
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    }
+
+
+    /* =========================================
+       SCROLLBAR
+    ========================================= */
+
+    ::-webkit-scrollbar {
+        width: 9px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #edf3f6;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #b9cdd9;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #198fd1;
+    }
+
+
+    /* =========================================
+       RESPONSIVIDADE
+    ========================================= */
+
+    @media (max-width: 500px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .container {
+            padding: 32px 22px;
+        }
+
+        h2 {
+            font-size: 22px;
+        }
+
+        input,
+        button {
+            font-size: 14px;
+        }
+    }
+</style>
+
+
+</head>
+
+<body>
+
+
+<div class="container">
+
+    <h2>🏥 Sistema Hospitalar</h2>
+
+    <input
+        id="usuario"
+        type="text"
+        placeholder="Usuário"
+        autocomplete="username"
+    >
+
+    <input
+        id="senha"
+        type="password"
+        placeholder="Senha"
+        autocomplete="current-password"
+    >
+
+    <button onclick="login()">
+        Entrar
+    </button>
+
+</div>
+
+
+<script>
+
+    function login() {
+
+        // Pegar os valores dos campos
+        const usuario = document.getElementById("usuario").value.trim();
+        const senha = document.getElementById("senha").value;
+
+        // Verificar se os campos foram preenchidos
+        if (!usuario || !senha) {
+            alert("Preencha o usuário e a senha.");
+            return;
+        }
+
+        // Enviar login para o servidor
+        fetch("/login", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                usuario: usuario,
+                senha: senha
+            })
+
+        })
+
+        .then(response => {
+
+            return response.json().then(data => ({
+                status: response.status,
+                data: data
+            }));
+
+        })
+
+        .then(resultado => {
+
+            const data = resultado.data;
+
+            console.log("Resposta do servidor:", data);
+
+            // Login inválido
+            if (!data.sucesso) {
+
+                alert(data.erro || "Usuário ou senha incorretos.");
+
+                return;
+            }
+
+
+            // =========================================
+            // PEGAR O TIPO DO USUÁRIO
+            // =========================================
+
+            const tipo = data.usuario.tipo;
+
+
+            // =========================================
+            // REDIRECIONAMENTO
+            // =========================================
+
+            if (tipo === "triagem") {
+
+                window.location.href = "/triagem.html";
+
+            }
+
+            else if (tipo === "medico") {
+
+                window.location.href = "/medico.html";
+
+            }
+
+            else if (tipo === "atendimento") {
+
+                window.location.href = "/atendimento.html";
+
+            }
+
+            else {
+
+                alert("Tipo de usuário não reconhecido.");
+
+                console.error(
+                    "Tipo recebido:",
+                    tipo
+                );
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Erro ao fazer login:",
+                error
+            );
+
+            alert(
+                "Não foi possível conectar ao servidor."
+            );
+
+        });
+
+    }
+
+
+    // =========================================
+    // PERMITIR LOGIN APERTANDO ENTER
+    // =========================================
+
+    document
+        .getElementById("senha")
+        .addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+                login();
+            }
+
+        });
+
+</script>
+
+
+</body>
+
+</html>
