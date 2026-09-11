@@ -1,1 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Alta Médica</title>
+
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Biblioteca para criação do PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+
+    .alta-container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.12);
+    }
+
+    .alta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+
+    .alta-header h2 {
+      margin: 0;
+    }
+
+    .btn-voltar {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-voltar:hover {
+      background: #545b62;
+    }
+
+    .form-grupo {
+      margin-bottom: 18px;
+    }
+
+    .form-grupo label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .form-grupo input,
+    .form-grupo select,
+    .form-grupo textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 15px;
+    }
+
+    .form-grupo textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn-alta-final {
+      width: 100%;
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .btn-alta-final:hover {
+      background: #218838;
+    }
+
+    .info-alta {
+      background: #f0f4ff;
+      border: 1px solid #d0d8f0;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .status-alta {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<div class="alta-container">
+
+  <div class="alta-header">
+
+    <h2>📄 Alta Médica</h2>
+
+    <button
+      class="btn-voltar"
+      onclick="window.location.href='medico.html'">
+
+      ← Voltar
+
+    </button>
+
+  </div>
+
+
+  <div class="info-alta">
+
+    <strong>Status:</strong>
+
+    <span class="status-alta">
+      ALTA MÉDICA
+    </span>
+
+    <p style="margin-bottom:0;">
+      Preencha as informações abaixo para registrar
+      a alta e gerar o documento em PDF.
+    </p>
+
+  </div>
+
+
+  <div class="form-grupo">
+
+    <label for="paciente">
+      Paciente
+    </label>
+
+    <select id="paciente">
+
+      <option value="">
+        Selecione o paciente
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div class="form-grupo">
+
+    <label for="diagnostico">
+      Diagnóstico
+    </label>
+
+    <input
+      type="text"
+      id="diagnostico"
+      placeholder="Digite o diagnóstico">
+
+  </div>
+
+
+  <div class="form-grupo">
+
+    <label for="tratamento">
+      Tratamento / Medicação
+    </label>
+
+    <input
+      type="text"
+      id="tratamento"
+      placeholder="Tratamento ou medicação prescrita">
+
+  </div>
+
+
+  <div class="form-grupo">
+
+    <label for="orientacoes">
+      Orientações para o paciente
+    </label>
+
+    <textarea
+      id="orientacoes"
+      placeholder="Digite as orientações para o paciente..."></textarea>
+
+  </div>
+
+
+  <div class="form-grupo">
+
+    <label for="observacoes">
+      Observações
+    </label>
+
+    <textarea
+      id="observacoes"
+      placeholder="Observações adicionais..."></textarea>
+
+  </div>
+
+
+  <button
+    class="btn-alta-final"
+    onclick="darAlta()">
+
+    📄 Dar Alta e Gerar PDF
+
+  </button>
+
+</div>
+
+
+<script>
+
+let pacientes = [];
+
+
+/* ================================
+   CARREGAR PACIENTES
+================================ */
+
+function carregarPacientes() {
+
+  fetch("/triagens")
+
+    .then(response => response.json())
+
+    .then(data => {
+
+      pacientes = data;
+
+      const select =
+        document.getElementById("paciente");
+
+      select.innerHTML = `
+        <option value="">
+          Selecione o paciente
+        </option>
+      `;
+
+      data.forEach((paciente, index) => {
+
+        const option =
+          document.createElement("option");
+
+        option.value = index;
+
+        option.textContent =
+          paciente.nome;
+
+        select.appendChild(option);
+
+      });
+
+    })
+
+    .catch(error => {
+
+      console.error(
+        "Erro ao carregar pacientes:",
+        error
+      );
+
+      alert(
+        "Não foi possível carregar os pacientes."
+      );
+
+    });
+
+}
+
+
+/* ================================
+   PREENCHER DADOS DO PACIENTE
+================================ */
+
+document
+  .getElementById("paciente")
+  .addEventListener("change", function() {
+
+    const index = this.value;
+
+    if (index === "") {
+      return;
+    }
+
+    const paciente =
+      pacientes[index];
+
+    if (!paciente) {
+      return;
+    }
+
+    /*
+      Se existir observação na triagem,
+      ela será colocada automaticamente
+      nas observações da alta.
+    */
+
+    document.getElementById("observacoes").value =
+      paciente.observacao || "";
+
+  });
+
+
+/* ================================
+   DAR ALTA
+================================ */
+
+function darAlta() {
+
+  const select =
+    document.getElementById("paciente");
+
+  const index =
+    select.value;
+
+  const diagnostico =
+    document.getElementById("diagnostico").value.trim();
+
+  const tratamento =
+    document.getElementById("tratamento").value.trim();
+
+  const orientacoes =
+    document.getElementById("orientacoes").value.trim();
+
+  const observacoes =
+    document.getElementById("observacoes").value.trim();
+
+
+  if (index === "") {
+
+    alert(
+      "Selecione um paciente."
+    );
+
+    return;
+  }
+
+
+  if (!diagnostico) {
+
+    alert(
+      "Digite o diagnóstico."
+    );
+
+    return;
+  }
+
+
+  const paciente =
+    pacientes[index];
+
+
+  if (!paciente) {
+
+    alert(
+      "Paciente não encontrado."
+    );
+
+    return;
+  }
+
+
+  const agora =
+    new Date();
+
+
+  const data =
+    agora.toLocaleDateString("pt-BR");
+
+
+  const hora =
+    agora.toLocaleTimeString("pt-BR");
+
+
+  gerarPDF(
+    paciente.nome,
+    diagnostico,
+    tratamento,
+    orientacoes,
+    observacoes,
+    data,
+    hora
+  );
+
+}
+
+
+/* ================================
+   GERAR PDF
+================================ */
+
+function gerarPDF(
+  nome,
+  diagnostico,
+  tratamento,
+  orientacoes,
+  observacoes,
+  data,
+  hora
+) {
+
+  const {
+    jsPDF
+  } = window.jspdf;
+
+
+  const pdf =
+    new jsPDF();
+
+
+  /*
+    Cabeçalho
+  */
+
+  pdf.setFontSize(20);
+
+  pdf.setFont("helvetica", "bold");
+
+  pdf.text(
+    "SISTEMA HOSPITALAR",
+    105,
+    25,
+    {
+      align: "center"
+    }
+  );
+
+
+  pdf.setFontSize(16);
+
+  pdf.text(
+    "DOCUMENTO DE ALTA MÉDICA",
+    105,
+    38,
+    {
+      align: "center"
+    }
+  );
+
+
+  /*
+    Linha
+  */
+
+  pdf.setLineWidth(0.5);
+
+  pdf.line(
+    20,
+    45,
+    190,
+    45
+  );
+
+
+  /*
+    Status
+  */
+
+  pdf.setFontSize(12);
+
+  pdf.setFont("helvetica", "bold");
+
+  pdf.text(
+    "STATUS: ALTA MÉDICA",
+    20,
+    58
+  );
+
+
+  /*
+    Dados
+  */
+
+  pdf.setFont("helvetica", "normal");
+
+  pdf.setFontSize(12);
+
+
+  pdf.text(
+    "Paciente:",
+    20,
+    75
+  );
+
+  pdf.setFont("helvetica", "bold");
+
+  pdf.text(
+    nome,
+    55,
+    75
+  );
+
+
+  pdf.setFont("helvetica", "normal");
+
+  pdf.text(
+    "Data:",
+    20,
+    88
+  );
+
+  pdf.text(
+    data,
+    55,
+    88
+  );
+
+
+  pdf.text(
+    "Horário:",
+    110,
+    88
+  );
+
+  pdf.text(
+    hora,
+    140,
+    88
+  );
+
+
+  /*
+    Diagnóstico
+  */
+
+  pdf.setFont("helvetica", "bold");
+
+  pdf.text(
+    "Diagnóstico:",
+    20,
+    105
+  );
+
+  pdf.setFont("helvetica", "normal");
+
+  let textoDiagnostico =
+    pdf.splitTextToSize(
+      diagnostico || "Não informado",
+      160
+    );
+
+  pdf.text(
+    textoDiagnostico,
+    20,
+    115
+  );
+
+
+  let y =
+    115 +
+    (textoDiagnostico.length * 7);
+
+
+  /*
+    Tratamento
+  */
+
+  pdf.setFont("helvetica", "bold");
+
+  pdf.text(
+    "Tratamento / Medicação:",
+    20,
+    y + 8
+  );
+
+  pdf.setFont("helvetica", "normal");
+
+  let textoTratamento =
+    pdf.splitTextToSize(
+      tratamento || "Não informado",
+      160
+    );
+
+  pdf.text(
+    textoTratamento,
+    20,
+    y + 18
+  );
+
+
+  y +=
+    18 +
+    (textoTratamento.length * 7);
+
+
+  /*
+    Orientações
+  */
+
+  pdf.setFont("helvetica", "bold");
+
+  pdf.text(
+    "Orientações:",
+    20,
+    y + 8
+  );
+
+  pdf.setFont("helvetica", "normal");
+
+  let textoOrientacoes =
+    pdf.splitTextToSize(
+      orientacoes || "Nenhuma orientação registrada.",
+      160
+    );
+
+  pdf.text(
+    textoOrientacoes,
+    20,
+    y + 18
+  );
+
+
+  y +=
+    18 +
+    (textoOrientacoes.length * 7);
+
+
+  /*
+    Observações
+  */
+
+  pdf.setFont("helvetica", "bold");
+
+  pdf.text(
+    "Observações:",
+    20,
+    y + 8
+  );
+
+  pdf.setFont("helvetica", "normal");
+
+  let textoObservacoes =
+    pdf.splitTextToSize(
+      observacoes || "Nenhuma observação registrada.",
+      160
+    );
+
+  pdf.text(
+    textoObservacoes,
+    20,
+    y + 18
+  );
+
+
+  /*
+    Assinatura
+  */
+
+  pdf.line(
+    60,
+    260,
+    150,
+    260
+  );
+
+  pdf.setFontSize(10);
+
+  pdf.text(
+    "Assinatura do médico",
+    105,
+    267,
+    {
+      align: "center"
+    }
+  );
+
+
+  /*
+    Rodapé
+  */
+
+  pdf.setFontSize(9);
+
+  pdf.setTextColor(100);
+
+  pdf.text(
+    "Documento gerado pelo Sistema Hospitalar",
+    105,
+    285,
+    {
+      align: "center"
+    }
+  );
+
+
+  /*
+    Nome do arquivo
+  */
+
+  const nomeArquivo =
+    "Alta_" +
+    nome
+      .replace(/[^a-zA-Z0-9À-ÿ ]/g, "")
+      .replace(/\s+/g, "_") +
+    ".pdf";
+
+
+  /*
+    Baixar PDF
+  */
+
+  pdf.save(nomeArquivo);
+
+
+  /*
+    Aviso
+  */
+
+  setTimeout(() => {
+
+    alert(
+      "✅ Alta registrada!\n\n" +
+      "O documento de alta foi gerado em PDF."
+    );
+
+  }, 300);
+
+}
+
+
+/* ================================
+   INICIAR
+================================ */
+
+carregarPacientes();
+
+</script>
+
+</body>
+</html>
