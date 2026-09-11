@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -12,7 +13,7 @@
 
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Biblioteca para criação do PDF -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
@@ -33,6 +34,7 @@
       border-bottom: 2px solid #ddd;
       padding-bottom: 15px;
       margin-bottom: 25px;
+      gap: 10px;
     }
 
     .alta-header h2 {
@@ -78,23 +80,6 @@
       resize: vertical;
     }
 
-    .btn-alta-final {
-      width: 100%;
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 13px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    .btn-alta-final:hover {
-      background: #218838;
-    }
-
     .info-alta {
       background: #f0f4ff;
       border: 1px solid #d0d8f0;
@@ -113,9 +98,153 @@
       font-size: 13px;
     }
 
+    .botoes {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-preview {
+      flex: 1;
+      background: #17a2b8;
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .btn-preview:hover {
+      background: #117a8b;
+    }
+
+    /* ==============================
+       MODAL DE PRÉ-VISUALIZAÇÃO
+    ============================== */
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-conteudo {
+      width: 100%;
+      max-width: 1000px;
+      height: 95vh;
+      background: #eee;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: #343a40;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+    }
+
+    .btn-fechar {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-fechar:hover {
+      background: #bd2130;
+    }
+
+    .pdf-preview {
+      flex: 1;
+      background: #666;
+      padding: 10px;
+    }
+
+    .pdf-preview iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+      border-radius: 5px;
+    }
+
+    .modal-footer {
+      background: white;
+      padding: 15px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancelar {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-confirmar {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-confirmar:hover {
+      background: #218838;
+    }
+
+    @media (max-width: 600px) {
+
+      .alta-container {
+        margin: 10px;
+        padding: 20px;
+      }
+
+      .alta-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .botoes {
+        flex-direction: column;
+      }
+
+      .modal {
+        padding: 5px;
+      }
+
+    }
+
   </style>
 
 </head>
+
 
 <body>
 
@@ -145,12 +274,14 @@
     </span>
 
     <p style="margin-bottom:0;">
-      Preencha as informações abaixo para registrar
-      a alta e gerar o documento em PDF.
+      Preencha os dados e visualize o documento antes
+      de confirmar a alta.
     </p>
 
   </div>
 
+
+  <!-- PACIENTE -->
 
   <div class="form-grupo">
 
@@ -169,6 +300,8 @@
   </div>
 
 
+  <!-- DIAGNÓSTICO -->
+
   <div class="form-grupo">
 
     <label for="diagnostico">
@@ -182,6 +315,8 @@
 
   </div>
 
+
+  <!-- TRATAMENTO -->
 
   <div class="form-grupo">
 
@@ -197,6 +332,8 @@
   </div>
 
 
+  <!-- ORIENTAÇÕES -->
+
   <div class="form-grupo">
 
     <label for="orientacoes">
@@ -209,6 +346,8 @@
 
   </div>
 
+
+  <!-- OBSERVAÇÕES -->
 
   <div class="form-grupo">
 
@@ -223,13 +362,78 @@
   </div>
 
 
-  <button
-    class="btn-alta-final"
-    onclick="darAlta()">
+  <div class="botoes">
 
-    📄 Dar Alta e Gerar PDF
+    <button
+      class="btn-preview"
+      onclick="previsualizar()">
 
-  </button>
+      👁️ Pré-visualizar PDF
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ==========================================
+     MODAL
+========================================== -->
+
+<div
+  class="modal"
+  id="modalPreview">
+
+  <div class="modal-conteudo">
+
+    <div class="modal-header">
+
+      <h3>
+        👁️ Pré-visualização da Alta
+      </h3>
+
+      <button
+        class="btn-fechar"
+        onclick="fecharPreview()">
+
+        ✕ Fechar
+
+      </button>
+
+    </div>
+
+
+    <div class="pdf-preview">
+
+      <iframe
+        id="pdfFrame">
+      </iframe>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        class="btn-cancelar"
+        onclick="fecharPreview()">
+
+        ← Voltar e Editar
+
+      </button>
+
+      <button
+        class="btn-confirmar"
+        onclick="confirmarAlta()">
+
+        ✅ Confirmar e Salvar PDF
+
+      </button>
+
+    </div>
+
+  </div>
 
 </div>
 
@@ -238,10 +442,14 @@
 
 let pacientes = [];
 
+let pdfAtual = null;
 
-/* ================================
+let dadosAltaAtual = null;
+
+
+/* ==========================================
    CARREGAR PACIENTES
-================================ */
+========================================== */
 
 function carregarPacientes() {
 
@@ -286,7 +494,7 @@ function carregarPacientes() {
       );
 
       alert(
-        "Não foi possível carregar os pacientes."
+        "❌ Não foi possível carregar os pacientes."
       );
 
     });
@@ -294,44 +502,44 @@ function carregarPacientes() {
 }
 
 
-/* ================================
-   PREENCHER DADOS DO PACIENTE
-================================ */
+/* ==========================================
+   SELECIONAR PACIENTE
+========================================== */
 
 document
   .getElementById("paciente")
-  .addEventListener("change", function() {
+  .addEventListener(
+    "change",
+    function() {
 
-    const index = this.value;
+      const index =
+        this.value;
 
-    if (index === "") {
-      return;
+      if (index === "") {
+        return;
+      }
+
+      const paciente =
+        pacientes[index];
+
+      if (!paciente) {
+        return;
+      }
+
+      document
+        .getElementById("observacoes")
+        .value =
+          paciente.observacao || "";
+
     }
-
-    const paciente =
-      pacientes[index];
-
-    if (!paciente) {
-      return;
-    }
-
-    /*
-      Se existir observação na triagem,
-      ela será colocada automaticamente
-      nas observações da alta.
-    */
-
-    document.getElementById("observacoes").value =
-      paciente.observacao || "";
-
-  });
+  );
 
 
-/* ================================
-   DAR ALTA
-================================ */
+/* ==========================================
+   PRÉ-VISUALIZAR
+========================================== */
 
-function darAlta() {
+async function previsualizar() {
 
   const select =
     document.getElementById("paciente");
@@ -340,35 +548,53 @@ function darAlta() {
     select.value;
 
   const diagnostico =
-    document.getElementById("diagnostico").value.trim();
+    document
+      .getElementById("diagnostico")
+      .value
+      .trim();
 
   const tratamento =
-    document.getElementById("tratamento").value.trim();
+    document
+      .getElementById("tratamento")
+      .value
+      .trim();
 
   const orientacoes =
-    document.getElementById("orientacoes").value.trim();
+    document
+      .getElementById("orientacoes")
+      .value
+      .trim();
 
   const observacoes =
-    document.getElementById("observacoes").value.trim();
+    document
+      .getElementById("observacoes")
+      .value
+      .trim();
 
+
+  /* ==============================
+     VALIDAÇÃO
+  ============================== */
 
   if (index === "") {
 
     alert(
-      "Selecione um paciente."
+      "⚠️ Selecione um paciente."
     );
 
     return;
+
   }
 
 
   if (!diagnostico) {
 
     alert(
-      "Digite o diagnóstico."
+      "⚠️ Digite o diagnóstico."
     );
 
     return;
+
   }
 
 
@@ -379,10 +605,11 @@ function darAlta() {
   if (!paciente) {
 
     alert(
-      "Paciente não encontrado."
+      "❌ Paciente não encontrado."
     );
 
     return;
+
   }
 
 
@@ -391,39 +618,91 @@ function darAlta() {
 
 
   const data =
-    agora.toLocaleDateString("pt-BR");
+    agora.toLocaleDateString(
+      "pt-BR"
+    );
 
 
   const hora =
-    agora.toLocaleTimeString("pt-BR");
+    agora.toLocaleTimeString(
+      "pt-BR"
+    );
 
 
-  gerarPDF(
-    paciente.nome,
-    diagnostico,
-    tratamento,
-    orientacoes,
-    observacoes,
-    data,
-    hora
-  );
+  /* ==============================
+     GUARDAR DADOS
+  ============================== */
+
+  dadosAltaAtual = {
+
+    paciente:
+      paciente.nome,
+
+    diagnostico:
+      diagnostico,
+
+    tratamento:
+      tratamento,
+
+    orientacoes:
+      orientacoes,
+
+    observacoes:
+      observacoes,
+
+    data:
+      data,
+
+    hora:
+      hora
+
+  };
+
+
+  /* ==============================
+     GERAR PDF TEMPORÁRIO
+  ============================== */
+
+  pdfAtual =
+    criarPDF(
+      dadosAltaAtual
+    );
+
+
+  /*
+    Criar Blob para mostrar
+    dentro do iframe.
+  */
+
+  const blob =
+    pdfAtual.output("blob");
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  document
+    .getElementById("pdfFrame")
+    .src = url;
+
+
+  /* ==============================
+     ABRIR MODAL
+  ============================== */
+
+  document
+    .getElementById("modalPreview")
+    .style.display = "flex";
 
 }
 
 
-/* ================================
-   GERAR PDF
-================================ */
+/* ==========================================
+   CRIAR PDF
+========================================== */
 
-function gerarPDF(
-  nome,
-  diagnostico,
-  tratamento,
-  orientacoes,
-  observacoes,
-  data,
-  hora
-) {
+function criarPDF(dados) {
 
   const {
     jsPDF
@@ -434,13 +713,16 @@ function gerarPDF(
     new jsPDF();
 
 
-  /*
-    Cabeçalho
-  */
+  /* ==============================
+     CABEÇALHO
+  ============================== */
+
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
 
   pdf.setFontSize(20);
-
-  pdf.setFont("helvetica", "bold");
 
   pdf.text(
     "SISTEMA HOSPITALAR",
@@ -464,10 +746,6 @@ function gerarPDF(
   );
 
 
-  /*
-    Linha
-  */
-
   pdf.setLineWidth(0.5);
 
   pdf.line(
@@ -478,13 +756,16 @@ function gerarPDF(
   );
 
 
-  /*
-    Status
-  */
+  /* ==============================
+     STATUS
+  ============================== */
 
   pdf.setFontSize(12);
 
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
 
   pdf.text(
     "STATUS: ALTA MÉDICA",
@@ -493,14 +774,14 @@ function gerarPDF(
   );
 
 
-  /*
-    Dados
-  */
+  /* ==============================
+     PACIENTE
+  ============================== */
 
-  pdf.setFont("helvetica", "normal");
-
-  pdf.setFontSize(12);
-
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
 
   pdf.text(
     "Paciente:",
@@ -508,16 +789,26 @@ function gerarPDF(
     75
   );
 
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
 
   pdf.text(
-    nome,
+    dados.paciente,
     55,
     75
   );
 
 
-  pdf.setFont("helvetica", "normal");
+  /* ==============================
+     DATA E HORA
+  ============================== */
+
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
 
   pdf.text(
     "Data:",
@@ -526,7 +817,7 @@ function gerarPDF(
   );
 
   pdf.text(
-    data,
+    dados.data,
     55,
     88
   );
@@ -539,138 +830,174 @@ function gerarPDF(
   );
 
   pdf.text(
-    hora,
+    dados.hora,
     140,
     88
   );
 
 
-  /*
-    Diagnóstico
-  */
+  let y = 105;
 
-  pdf.setFont("helvetica", "bold");
+
+  /* ==============================
+     DIAGNÓSTICO
+  ============================== */
+
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
 
   pdf.text(
     "Diagnóstico:",
     20,
-    105
+    y
   );
 
-  pdf.setFont("helvetica", "normal");
+  y += 10;
 
-  let textoDiagnostico =
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  const diagnostico =
     pdf.splitTextToSize(
-      diagnostico || "Não informado",
-      160
+      dados.diagnostico ||
+      "Não informado",
+      165
     );
 
   pdf.text(
-    textoDiagnostico,
+    diagnostico,
     20,
-    115
+    y
   );
 
+  y +=
+    diagnostico.length * 7 +
+    10;
 
-  let y =
-    115 +
-    (textoDiagnostico.length * 7);
 
+  /* ==============================
+     TRATAMENTO
+  ============================== */
 
-  /*
-    Tratamento
-  */
-
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
 
   pdf.text(
     "Tratamento / Medicação:",
     20,
-    y + 8
+    y
   );
 
-  pdf.setFont("helvetica", "normal");
+  y += 10;
 
-  let textoTratamento =
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  const tratamento =
     pdf.splitTextToSize(
-      tratamento || "Não informado",
-      160
+      dados.tratamento ||
+      "Não informado",
+      165
     );
 
   pdf.text(
-    textoTratamento,
+    tratamento,
     20,
-    y + 18
+    y
   );
 
-
   y +=
-    18 +
-    (textoTratamento.length * 7);
+    tratamento.length * 7 +
+    10;
 
 
-  /*
-    Orientações
-  */
+  /* ==============================
+     ORIENTAÇÕES
+  ============================== */
 
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
 
   pdf.text(
     "Orientações:",
     20,
-    y + 8
+    y
   );
 
-  pdf.setFont("helvetica", "normal");
+  y += 10;
 
-  let textoOrientacoes =
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  const orientacoes =
     pdf.splitTextToSize(
-      orientacoes || "Nenhuma orientação registrada.",
-      160
+      dados.orientacoes ||
+      "Nenhuma orientação registrada.",
+      165
     );
 
   pdf.text(
-    textoOrientacoes,
+    orientacoes,
     20,
-    y + 18
+    y
   );
 
-
   y +=
-    18 +
-    (textoOrientacoes.length * 7);
+    orientacoes.length * 7 +
+    10;
 
 
-  /*
-    Observações
-  */
+  /* ==============================
+     OBSERVAÇÕES
+  ============================== */
 
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(
+    "helvetica",
+    "bold"
+  );
 
   pdf.text(
     "Observações:",
     20,
-    y + 8
+    y
   );
 
-  pdf.setFont("helvetica", "normal");
+  y += 10;
 
-  let textoObservacoes =
+  pdf.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  const observacoes =
     pdf.splitTextToSize(
-      observacoes || "Nenhuma observação registrada.",
-      160
+      dados.observacoes ||
+      "Nenhuma observação registrada.",
+      165
     );
 
   pdf.text(
-    textoObservacoes,
+    observacoes,
     20,
-    y + 18
+    y
   );
 
 
-  /*
-    Assinatura
-  */
+  /* ==============================
+     ASSINATURA
+  ============================== */
 
   pdf.line(
     60,
@@ -691,13 +1018,17 @@ function gerarPDF(
   );
 
 
-  /*
-    Rodapé
-  */
+  /* ==============================
+     RODAPÉ
+  ============================== */
 
   pdf.setFontSize(9);
 
-  pdf.setTextColor(100);
+  pdf.setTextColor(
+    100,
+    100,
+    100
+  );
 
   pdf.text(
     "Documento gerado pelo Sistema Hospitalar",
@@ -709,48 +1040,184 @@ function gerarPDF(
   );
 
 
-  /*
-    Nome do arquivo
-  */
-
-  const nomeArquivo =
-    "Alta_" +
-    nome
-      .replace(/[^a-zA-Z0-9À-ÿ ]/g, "")
-      .replace(/\s+/g, "_") +
-    ".pdf";
-
-
-  /*
-    Baixar PDF
-  */
-
-  pdf.save(nomeArquivo);
-
-
-  /*
-    Aviso
-  */
-
-  setTimeout(() => {
-
-    alert(
-      "✅ Alta registrada!\n\n" +
-      "O documento de alta foi gerado em PDF."
-    );
-
-  }, 300);
+  return pdf;
 
 }
 
 
-/* ================================
+/* ==========================================
+   FECHAR PRÉ-VISUALIZAÇÃO
+========================================== */
+
+function fecharPreview() {
+
+  document
+    .getElementById("modalPreview")
+    .style.display = "none";
+
+}
+
+
+/* ==========================================
+   CONFIRMAR ALTA
+========================================== */
+
+async function confirmarAlta() {
+
+  if (!dadosAltaAtual) {
+
+    alert(
+      "❌ Nenhuma alta para confirmar."
+    );
+
+    return;
+
+  }
+
+
+  const botao =
+    document.querySelector(
+      ".btn-confirmar"
+    );
+
+
+  botao.disabled = true;
+
+  botao.textContent =
+    "⏳ Salvando...";
+
+
+  try {
+
+    /* ==============================
+       SALVAR NO SERVIDOR
+    ============================== */
+
+    const resposta =
+      await fetch(
+        "/alta",
+        {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              paciente:
+                dadosAltaAtual.paciente,
+
+              diagnostico:
+                dadosAltaAtual.diagnostico,
+
+              tratamento:
+                dadosAltaAtual.tratamento,
+
+              orientacoes:
+                dadosAltaAtual.orientacoes,
+
+              observacoes:
+                dadosAltaAtual.observacoes
+
+            })
+
+        }
+      );
+
+
+    const resultado =
+      await resposta.json();
+
+
+    if (!resposta.ok) {
+
+      throw new Error(
+        resultado.erro ||
+        "Erro ao registrar alta."
+      );
+
+    }
+
+
+    /* ==============================
+       SALVAR PDF
+    ============================== */
+
+    const nomeArquivo =
+      "Alta_" +
+      dadosAltaAtual.paciente
+        .replace(
+          /[^a-zA-Z0-9À-ÿ ]/g,
+          ""
+        )
+        .replace(
+          /\s+/g,
+          "_"
+        ) +
+      ".pdf";
+
+
+    pdfAtual.save(
+      nomeArquivo
+    );
+
+
+    /* ==============================
+       FECHAR MODAL
+    ============================== */
+
+    fecharPreview();
+
+
+    alert(
+      "✅ Alta registrada com sucesso!\n\n" +
+      "O PDF foi salvo."
+    );
+
+
+    /* ==============================
+       VOLTAR PARA MÉDICO
+    ============================== */
+
+    window.location.href =
+      "medico.html";
+
+
+  } catch (erro) {
+
+    console.error(
+      "Erro ao registrar alta:",
+      erro
+    );
+
+    alert(
+      "❌ Não foi possível registrar a alta.\n\n" +
+      erro.message
+    );
+
+    botao.disabled = false;
+
+    botao.textContent =
+      "✅ Confirmar e Salvar PDF";
+
+  }
+
+}
+
+
+/* ==========================================
    INICIAR
-================================ */
+========================================== */
 
 carregarPacientes();
 
 </script>
 
 </body>
+
 </html>
+```
