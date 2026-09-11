@@ -18,9 +18,9 @@ app.use(cors());
 // =====================================================
 
 app.use(
-express.static(
-path.join(__dirname, "../frontend")
-)
+    express.static(
+        path.join(__dirname, "../frontend")
+    )
 );
 
 // =====================================================
@@ -28,73 +28,70 @@ path.join(__dirname, "../frontend")
 // =====================================================
 
 const uploadsPath =
-path.join(__dirname, "uploads");
+    path.join(__dirname, "uploads");
 
 // Criar pasta uploads se não existir
 
 if (!fs.existsSync(uploadsPath)) {
 
-
-fs.mkdirSync(
-    uploadsPath,
-    {
-        recursive: true
-    }
-);
-
+    fs.mkdirSync(
+        uploadsPath,
+        {
+            recursive: true
+        }
+    );
 
 }
 
 // Configuração do Multer
 
 const storage =
-multer.diskStorage({
+    multer.diskStorage({
 
+        destination: function (req, file, cb) {
 
-    destination: function (req, file, cb) {
-
-        cb(
-            null,
-            uploadsPath
-        );
-
-    },
-
-    filename: function (req, file, cb) {
-
-        const extensao =
-            path.extname(
-                file.originalname
+            cb(
+                null,
+                uploadsPath
             );
 
-        const nomeArquivo =
-            Date.now() +
-            "-" +
-            Math.round(
-                Math.random() * 1E9
-            ) +
-            extensao;
+        },
 
-        cb(
-            null,
-            nomeArquivo
-        );
+        filename: function (req, file, cb) {
 
-    }
+            const extensao =
+                path.extname(
+                    file.originalname
+                );
 
-});
+            const nomeArquivo =
+                Date.now() +
+                "-" +
+                Math.round(
+                    Math.random() * 1E9
+                ) +
+                extensao;
+
+            cb(
+                null,
+                nomeArquivo
+            );
+
+        }
+
+    });
 
 
 const upload =
-multer({
-storage: storage
-});
+    multer({
+        storage: storage
+    });
 
 // Tornar a pasta uploads acessível
 
 app.use(
-"/uploads",
-express.static(uploadsPath)
+    "/uploads",
+    express.static(uploadsPath)
 );
 
 // =====================================================
@@ -102,10 +99,10 @@ express.static(uploadsPath)
 // =====================================================
 
 const DB_FILE =
-path.join(
-__dirname,
-"db.json"
-);
+    path.join(
+        __dirname,
+        "db.json"
+    );
 
 // =====================================================
 // LER BANCO
@@ -113,66 +110,69 @@ __dirname,
 
 function readDB() {
 
+    if (!fs.existsSync(DB_FILE)) {
 
-if (!fs.existsSync(DB_FILE)) {
+        return {
 
-    return {
+            usuarios: [],
 
-        usuarios: [],
+            pacientes: [],
 
-        pacientes: [],
+            triagens: [],
 
-        triagens: [],
+            consultas: [],
 
-        consultas: [],
+            altas: [],
 
-        tv_chamada: null,
+            tv_chamada: null,
 
-        tv_historico: []
+            tv_historico: []
 
-    };
+        };
 
-}
+    }
 
+    const db =
+        JSON.parse(
+            fs.readFileSync(
+                DB_FILE,
+                "utf8"
+            )
+        );
 
-const db =
-    JSON.parse(
-        fs.readFileSync(
-            DB_FILE,
-            "utf8"
-        )
-    );
+    // Garantir estruturas
 
+    if (!Array.isArray(db.usuarios)) {
+        db.usuarios = [];
+    }
 
-// Garantir estruturas
+    if (!Array.isArray(db.pacientes)) {
+        db.pacientes = [];
+    }
 
-if (!Array.isArray(db.usuarios)) {
-    db.usuarios = [];
-}
+    if (!Array.isArray(db.triagens)) {
+        db.triagens = [];
+    }
 
-if (!Array.isArray(db.pacientes)) {
-    db.pacientes = [];
-}
+    if (!Array.isArray(db.consultas)) {
+        db.consultas = [];
+    }
 
-if (!Array.isArray(db.triagens)) {
-    db.triagens = [];
-}
+    // NOVO: garantir estrutura de altas
 
-if (!Array.isArray(db.consultas)) {
-    db.consultas = [];
-}
+    if (!Array.isArray(db.altas)) {
+        db.altas = [];
+    }
 
-if (!db.tv_chamada) {
-    db.tv_chamada = null;
-}
+    if (!db.tv_chamada) {
+        db.tv_chamada = null;
+    }
 
-if (!Array.isArray(db.tv_historico)) {
-    db.tv_historico = [];
-}
+    if (!Array.isArray(db.tv_historico)) {
+        db.tv_historico = [];
+    }
 
-
-return db;
-
+    return db;
 
 }
 
@@ -182,21 +182,19 @@ return db;
 
 function writeDB(data) {
 
+    fs.writeFileSync(
 
-fs.writeFileSync(
+        DB_FILE,
 
-    DB_FILE,
+        JSON.stringify(
+            data,
+            null,
+            2
+        ),
 
-    JSON.stringify(
-        data,
-        null,
-        2
-    ),
+        "utf8"
 
-    "utf8"
-
-);
-
+    );
 
 }
 
@@ -205,79 +203,71 @@ fs.writeFileSync(
 // =====================================================
 
 app.post(
-"/login",
-(req, res) => {
+    "/login",
+    (req, res) => {
 
+        try {
 
-    try {
+            const db =
+                readDB();
 
-        const db =
-            readDB();
+            const usuario =
+                req.body.usuario;
 
+            const senha =
+                req.body.senha;
 
-        const usuario =
-            req.body.usuario;
+            const user =
+                db.usuarios.find(
+                    u =>
+                        u.usuario === usuario &&
+                        u.senha === senha
+                );
 
-        const senha =
-            req.body.senha;
+            if (!user) {
 
+                return res
+                    .status(401)
+                    .json({
 
-        const user =
-            db.usuarios.find(
-                u =>
-                    u.usuario === usuario &&
-                    u.senha === senha
+                        sucesso: false,
+
+                        erro:
+                            "Login inválido"
+
+                    });
+
+            }
+
+            res.json({
+
+                sucesso: true,
+
+                usuario: user
+
+            });
+
+        } catch (erro) {
+
+            console.error(
+                "Erro no login:",
+                erro
             );
 
-
-        if (!user) {
-
-            return res
-                .status(401)
+            res
+                .status(500)
                 .json({
 
                     sucesso: false,
 
                     erro:
-                        "Login inválido"
+                        erro.message
 
                 });
 
         }
 
-
-        res.json({
-
-            sucesso: true,
-
-            usuario: user
-
-        });
-
-
-    } catch (erro) {
-
-        console.error(
-            "Erro no login:",
-            erro
-        );
-
-
-        res
-            .status(500)
-            .json({
-
-                sucesso: false,
-
-                erro:
-                    erro.message
-
-            });
-
     }
-
-}
-
 
 );
 
@@ -287,171 +277,159 @@ app.post(
 // =====================================================
 
 app.post(
-"/atendimento",
-upload.single("foto"),
-(req, res) => {
+    "/atendimento",
+    upload.single("foto"),
+    (req, res) => {
 
+        try {
 
-    try {
+            console.log(
+                "📥 Dados recebidos no atendimento:"
+            );
 
-        console.log(
-            "📥 Dados recebidos no atendimento:"
-        );
+            console.log(
+                req.body
+            );
 
-        console.log(
-            req.body
-        );
+            const db =
+                readDB();
 
+            // =================================================
+            // FOTO
+            // =================================================
 
-        const db =
-            readDB();
+            let foto = "";
 
+            if (req.file) {
 
-        // =================================================
-        // FOTO
-        // =================================================
+                foto =
+                    "/uploads/" +
+                    req.file.filename;
 
-        let foto = "";
+            }
 
+            // =================================================
+            // CRIAR PACIENTE
+            // =================================================
 
-        if (req.file) {
+            const paciente = {
 
-            foto =
-                "/uploads/" +
-                req.file.filename;
+                id:
+                    Date.now(),
+
+                nome:
+                    req.body.nome || "",
+
+                cpf:
+                    req.body.cpf || "",
+
+                rg:
+                    req.body.rg || "",
+
+                dataNascimento:
+                    req.body.dataNascimento || "",
+
+                sexo:
+                    req.body.sexo || "",
+
+                nomeMae:
+                    req.body.nomeMae || "",
+
+                estadoCivil:
+                    req.body.estadoCivil || "",
+
+                endereco:
+                    req.body.endereco || "",
+
+                telefone:
+                    req.body.telefone || "",
+
+                email:
+                    req.body.email || "",
+
+                contatoEmergencia:
+                    req.body.contatoEmergencia || "",
+
+                tipo:
+                    req.body.tipo || "Convenio",
+
+                foto:
+                    foto,
+
+                status:
+                    "triagem",
+
+                createdAt:
+                    new Date().toISOString()
+
+            };
+
+            // =================================================
+            // ADICIONAR AO BANCO
+            // =================================================
+
+            db.pacientes.push(
+                paciente
+            );
+
+            // =================================================
+            // SALVAR DB.JSON
+            // =================================================
+
+            writeDB(
+                db
+            );
+
+            console.log(
+                "✅ Paciente cadastrado com sucesso:"
+            );
+
+            console.log(
+                paciente
+            );
+
+            // =================================================
+            // RESPONDER AO FRONTEND
+            // =================================================
+
+            res
+                .status(201)
+                .json({
+
+                    sucesso: true,
+
+                    mensagem:
+                        "Paciente cadastrado com sucesso.",
+
+                    paciente:
+                        paciente
+
+                });
+
+        } catch (erro) {
+
+            console.error(
+                "❌ ERRO AO CADASTRAR PACIENTE:"
+            );
+
+            console.error(
+                erro
+            );
+
+            res
+                .status(500)
+                .json({
+
+                    sucesso: false,
+
+                    erro:
+                        erro.message
+
+                });
 
         }
 
-
-        // =================================================
-        // CRIAR PACIENTE
-        // =================================================
-
-        const paciente = {
-
-            id:
-                Date.now(),
-
-            nome:
-                req.body.nome || "",
-
-            cpf:
-                req.body.cpf || "",
-
-            rg:
-                req.body.rg || "",
-
-            dataNascimento:
-                req.body.dataNascimento || "",
-
-            sexo:
-                req.body.sexo || "",
-
-            nomeMae:
-                req.body.nomeMae || "",
-
-            estadoCivil:
-                req.body.estadoCivil || "",
-
-            endereco:
-                req.body.endereco || "",
-
-            telefone:
-                req.body.telefone || "",
-
-            email:
-                req.body.email || "",
-
-            contatoEmergencia:
-                req.body.contatoEmergencia || "",
-
-            tipo:
-                req.body.tipo || "Convenio",
-
-            foto:
-                foto,
-
-            status:
-                "triagem",
-
-            createdAt:
-                new Date().toISOString()
-
-        };
-
-
-        // =================================================
-        // ADICIONAR AO BANCO
-        // =================================================
-
-        db.pacientes.push(
-            paciente
-        );
-
-
-        // =================================================
-        // SALVAR DB.JSON
-        // =================================================
-
-        writeDB(
-            db
-        );
-
-
-        console.log(
-            "✅ Paciente cadastrado com sucesso:"
-        );
-
-        console.log(
-            paciente
-        );
-
-
-        // =================================================
-        // RESPONDER AO FRONTEND
-        // =================================================
-
-        res
-            .status(201)
-            .json({
-
-                sucesso: true,
-
-                mensagem:
-                    "Paciente cadastrado com sucesso.",
-
-                paciente:
-                    paciente
-
-            });
-
-
-    } catch (erro) {
-
-        console.error(
-            "❌ ERRO AO CADASTRAR PACIENTE:"
-        );
-
-        console.error(
-            erro
-        );
-
-
-        res
-            .status(500)
-            .json({
-
-                sucesso: false,
-
-                erro:
-                    erro.message
-
-            });
-
     }
-
-}
-
 
 );
 
@@ -460,36 +438,32 @@ upload.single("foto"),
 // =====================================================
 
 app.get(
-"/pacientes",
-(req, res) => {
+    "/pacientes",
+    (req, res) => {
 
+        try {
 
-    try {
+            const db =
+                readDB();
 
-        const db =
-            readDB();
+            res.json(
+                db.pacientes
+            );
 
+        } catch (erro) {
 
-        res.json(
-            db.pacientes
-        );
+            res
+                .status(500)
+                .json({
 
+                    erro:
+                        erro.message
 
-    } catch (erro) {
+                });
 
-        res
-            .status(500)
-            .json({
-
-                erro:
-                    erro.message
-
-            });
+        }
 
     }
-
-}
-
 
 );
 
@@ -498,125 +472,114 @@ app.get(
 // =====================================================
 
 app.post(
-"/triagem",
-(req, res) => {
+    "/triagem",
+    (req, res) => {
 
+        try {
 
-    try {
+            const db =
+                readDB();
 
-        const db =
-            readDB();
+            let risco =
+                req.body.risco;
 
+            const temperatura =
+                Number(
+                    req.body.temperatura
+                );
 
-        let risco =
-            req.body.risco;
+            if (temperatura >= 39) {
 
+                risco =
+                    "vermelho";
 
-        const temperatura =
-            Number(
-                req.body.temperatura
+            }
+
+            else if (temperatura >= 38) {
+
+                risco =
+                    "amarelo";
+
+            }
+
+            else if (!risco) {
+
+                risco =
+                    "verde";
+
+            }
+
+            const triagem = {
+
+                id:
+                    Date.now(),
+
+                nome:
+                    req.body.nome || "",
+
+                sintoma:
+                    req.body.sintoma || "",
+
+                temperatura:
+                    req.body.temperatura || "",
+
+                alergia:
+                    req.body.alergia || "",
+
+                observacao:
+                    req.body.observacao || "",
+
+                risco:
+                    risco,
+
+                status:
+                    "aguardando_medico",
+
+                createdAt:
+                    new Date().toISOString()
+
+            };
+
+            db.triagens.push(
+                triagem
             );
 
+            writeDB(
+                db
+            );
 
-        if (temperatura >= 39) {
+            res
+                .status(201)
+                .json({
 
-            risco =
-                "vermelho";
+                    sucesso: true,
+
+                    triagem:
+                        triagem
+
+                });
+
+        } catch (erro) {
+
+            console.error(
+                "Erro na triagem:",
+                erro
+            );
+
+            res
+                .status(500)
+                .json({
+
+                    sucesso: false,
+
+                    erro:
+                        erro.message
+
+                });
 
         }
-
-        else if (temperatura >= 38) {
-
-            risco =
-                "amarelo";
-
-        }
-
-        else if (!risco) {
-
-            risco =
-                "verde";
-
-        }
-
-
-        const triagem = {
-
-            id:
-                Date.now(),
-
-            nome:
-                req.body.nome || "",
-
-            sintoma:
-                req.body.sintoma || "",
-
-            temperatura:
-                req.body.temperatura || "",
-
-            alergia:
-                req.body.alergia || "",
-
-            observacao:
-                req.body.observacao || "",
-
-            risco:
-                risco,
-
-            status:
-                "aguardando_medico",
-
-            createdAt:
-                new Date().toISOString()
-
-        };
-
-
-        db.triagens.push(
-            triagem
-        );
-
-
-        writeDB(
-            db
-        );
-
-
-        res
-            .status(201)
-            .json({
-
-                sucesso: true,
-
-                triagem:
-                    triagem
-
-            });
-
-
-    } catch (erro) {
-
-        console.error(
-            "Erro na triagem:",
-            erro
-        );
-
-
-        res
-            .status(500)
-            .json({
-
-                sucesso: false,
-
-                erro:
-                    erro.message
-
-            });
 
     }
-
-}
-
 
 );
 
@@ -625,36 +588,32 @@ app.post(
 // =====================================================
 
 app.get(
-"/triagens",
-(req, res) => {
+    "/triagens",
+    (req, res) => {
 
+        try {
 
-    try {
+            const db =
+                readDB();
 
-        const db =
-            readDB();
+            res.json(
+                db.triagens
+            );
 
+        } catch (erro) {
 
-        res.json(
-            db.triagens
-        );
+            res
+                .status(500)
+                .json({
 
+                    erro:
+                        erro.message
 
-    } catch (erro) {
+                });
 
-        res
-            .status(500)
-            .json({
-
-                erro:
-                    erro.message
-
-            });
+        }
 
     }
-
-}
-
 
 );
 
@@ -663,91 +622,81 @@ app.get(
 // =====================================================
 
 app.post(
-"/tv/chamar",
-(req, res) => {
+    "/tv/chamar",
+    (req, res) => {
 
+        try {
 
-    try {
+            const db =
+                readDB();
 
-        const db =
-            readDB();
+            const chamada = {
 
+                id:
+                    Date.now().toString(),
 
-        const chamada = {
+                localTipo:
+                    req.body.localTipo,
 
-            id:
-                Date.now().toString(),
+                localNumero:
+                    req.body.localNumero,
 
-            localTipo:
-                req.body.localTipo,
+                paciente:
+                    req.body.paciente,
 
-            localNumero:
-                req.body.localNumero,
+                hora:
+                    new Date().toLocaleTimeString(
+                        "pt-BR",
+                        {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        }
+                    )
 
-            paciente:
-                req.body.paciente,
+            };
 
-            hora:
-                new Date().toLocaleTimeString(
-                    "pt-BR",
-                    {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    }
-                )
+            db.tv_chamada =
+                chamada;
 
-        };
+            db.tv_historico.unshift(
+                chamada
+            );
 
+            if (
+                db.tv_historico.length > 5
+            ) {
 
-        db.tv_chamada =
-            chamada;
+                db.tv_historico.pop();
 
+            }
 
-        db.tv_historico.unshift(
-            chamada
-        );
+            writeDB(
+                db
+            );
 
+            res.json(
+                chamada
+            );
 
-        if (
-            db.tv_historico.length > 5
-        ) {
+        } catch (erro) {
 
-            db.tv_historico.pop();
+            console.error(
+                "Erro na chamada da TV:",
+                erro
+            );
+
+            res
+                .status(500)
+                .json({
+
+                    erro:
+                        erro.message
+
+                });
 
         }
 
-
-        writeDB(
-            db
-        );
-
-
-        res.json(
-            chamada
-        );
-
-
-    } catch (erro) {
-
-        console.error(
-            "Erro na chamada da TV:",
-            erro
-        );
-
-
-        res
-            .status(500)
-            .json({
-
-                erro:
-                    erro.message
-
-            });
-
     }
-
-}
-
 
 );
 
@@ -756,42 +705,38 @@ app.post(
 // =====================================================
 
 app.get(
-"/tv/chamada",
-(req, res) => {
+    "/tv/chamada",
+    (req, res) => {
 
+        try {
 
-    try {
+            const db =
+                readDB();
 
-        const db =
-            readDB();
+            res.json({
 
+                chamada:
+                    db.tv_chamada,
 
-        res.json({
-
-            chamada:
-                db.tv_chamada,
-
-            historico:
-                db.tv_historico
-
-        });
-
-
-    } catch (erro) {
-
-        res
-            .status(500)
-            .json({
-
-                erro:
-                    erro.message
+                historico:
+                    db.tv_historico
 
             });
 
+        } catch (erro) {
+
+            res
+                .status(500)
+                .json({
+
+                    erro:
+                        erro.message
+
+                });
+
+        }
+
     }
-
-}
-
 
 );
 
@@ -800,36 +745,34 @@ app.get(
 // =====================================================
 
 app.get(
-"/lista-medicacoes",
-(req, res) => {
+    "/lista-medicacoes",
+    (req, res) => {
 
+        res.json([
 
-    res.json([
+            "Dipirona",
 
-        "Dipirona",
+            "Paracetamol",
 
-        "Paracetamol",
+            "Ibuprofeno",
 
-        "Ibuprofeno",
+            "Amoxicilina",
 
-        "Amoxicilina",
+            "Azitromicina",
 
-        "Azitromicina",
+            "Loratadina",
 
-        "Loratadina",
+            "Omeprazol",
 
-        "Omeprazol",
+            "Buscopan",
 
-        "Buscopan",
+            "Dramin",
 
-        "Dramin",
+            "Soro fisiológico"
 
-        "Soro fisiológico"
+        ]);
 
-    ]);
-
-}
-
+    }
 
 );
 
@@ -838,84 +781,290 @@ app.get(
 // =====================================================
 
 app.post(
-"/consulta",
-(req, res) => {
+    "/consulta",
+    (req, res) => {
 
+        try {
 
-    try {
+            const db =
+                readDB();
 
-        const db =
-            readDB();
+            const consulta = {
 
+                id:
+                    Date.now(),
 
-        const consulta = {
+                paciente:
+                    req.body.paciente || "",
 
-            id:
-                Date.now(),
+                diagnostico:
+                    req.body.diagnostico || "",
 
-            paciente:
-                req.body.paciente || "",
+                medicacao:
+                    req.body.medicacao || "",
 
-            diagnostico:
-                req.body.diagnostico || "",
+                obs:
+                    req.body.obs || "",
 
-            medicacao:
-                req.body.medicacao || "",
+                createdAt:
+                    new Date().toISOString()
 
-            obs:
-                req.body.obs || "",
+            };
 
-            createdAt:
-                new Date().toISOString()
+            db.consultas.push(
+                consulta
+            );
 
-        };
+            writeDB(
+                db
+            );
 
+            res
+                .status(201)
+                .json({
 
-        db.consultas.push(
-            consulta
-        );
+                    sucesso: true,
 
+                    consulta:
+                        consulta
 
-        writeDB(
-            db
-        );
+                });
 
+        } catch (erro) {
 
-        res
-            .status(201)
-            .json({
+            console.error(
+                "Erro na consulta:",
+                erro
+            );
 
-                sucesso: true,
+            res
+                .status(500)
+                .json({
 
-                consulta:
-                    consulta
+                    sucesso: false,
 
-            });
+                    erro:
+                        erro.message
 
+                });
 
-    } catch (erro) {
-
-        console.error(
-            "Erro na consulta:",
-            erro
-        );
-
-
-        res
-            .status(500)
-            .json({
-
-                sucesso: false,
-
-                erro:
-                    erro.message
-
-            });
+        }
 
     }
 
-}
+);
 
+// =====================================================
+// NOVO - ALTA MÉDICA
+// =====================================================
+
+app.post(
+    "/alta",
+    (req, res) => {
+
+        try {
+
+            const db =
+                readDB();
+
+            const nome =
+                req.body.paciente || "";
+
+            const diagnostico =
+                req.body.diagnostico || "";
+
+            const tratamento =
+                req.body.tratamento || "";
+
+            const orientacoes =
+                req.body.orientacoes || "";
+
+            const observacoes =
+                req.body.observacoes || "";
+
+            // =================================================
+            // VALIDAR PACIENTE
+            // =================================================
+
+            if (!nome) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        sucesso: false,
+
+                        erro:
+                            "Paciente não informado."
+
+                    });
+
+            }
+
+            // =================================================
+            // CRIAR REGISTRO DA ALTA
+            // =================================================
+
+            const alta = {
+
+                id:
+                    Date.now(),
+
+                paciente:
+                    nome,
+
+                diagnostico:
+                    diagnostico,
+
+                tratamento:
+                    tratamento,
+
+                orientacoes:
+                    orientacoes,
+
+                observacoes:
+                    observacoes,
+
+                status:
+                    "alta",
+
+                data:
+                    new Date().toISOString(),
+
+                createdAt:
+                    new Date().toISOString()
+
+            };
+
+            // =================================================
+            // SALVAR ALTA
+            // =================================================
+
+            db.altas.push(
+                alta
+            );
+
+            // =================================================
+            // ATUALIZAR STATUS DO PACIENTE
+            // =================================================
+
+            const paciente =
+                db.pacientes.find(
+                    p =>
+                        p.nome === nome
+                );
+
+            if (paciente) {
+
+                paciente.status =
+                    "alta";
+
+                paciente.altaId =
+                    alta.id;
+
+            }
+
+            // =================================================
+            // REMOVER DA FILA DE TRIAGEM
+            // =================================================
+
+            db.triagens =
+                db.triagens.filter(
+                    t =>
+                        t.nome !== nome
+                );
+
+            // =================================================
+            // SALVAR BANCO
+            // =================================================
+
+            writeDB(
+                db
+            );
+
+            console.log(
+                "✅ Alta médica registrada:",
+                alta
+            );
+
+            // =================================================
+            // RESPONDER
+            // =================================================
+
+            res
+                .status(201)
+                .json({
+
+                    sucesso: true,
+
+                    mensagem:
+                        "Alta médica registrada com sucesso.",
+
+                    alta:
+                        alta
+
+                });
+
+        } catch (erro) {
+
+            console.error(
+                "❌ Erro ao registrar alta:",
+                erro
+            );
+
+            res
+                .status(500)
+                .json({
+
+                    sucesso: false,
+
+                    erro:
+                        erro.message
+
+                });
+
+        }
+
+    }
+
+);
+
+// =====================================================
+// LISTAR ALTAS
+// =====================================================
+
+app.get(
+    "/altas",
+    (req, res) => {
+
+        try {
+
+            const db =
+                readDB();
+
+            res.json(
+                db.altas
+            );
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao listar altas:",
+                erro
+            );
+
+            res
+                .status(500)
+                .json({
+
+                    erro:
+                        erro.message
+
+                });
+
+        }
+
+    }
 
 );
 
@@ -924,36 +1073,32 @@ app.post(
 // =====================================================
 
 app.get(
-"/medicacoes",
-(req, res) => {
+    "/medicacoes",
+    (req, res) => {
 
+        try {
 
-    try {
+            const db =
+                readDB();
 
-        const db =
-            readDB();
+            res.json(
+                db.consultas
+            );
 
+        } catch (erro) {
 
-        res.json(
-            db.consultas
-        );
+            res
+                .status(500)
+                .json({
 
+                    erro:
+                        erro.message
 
-    } catch (erro) {
+                });
 
-        res
-            .status(500)
-            .json({
-
-                erro:
-                    erro.message
-
-            });
+        }
 
     }
-
-}
-
 
 );
 
@@ -962,19 +1107,17 @@ app.get(
 // =====================================================
 
 app.get(
-"/",
-(req, res) => {
+    "/",
+    (req, res) => {
 
+        res.sendFile(
+            path.join(
+                __dirname,
+                "../frontend/index.html"
+            )
+        );
 
-    res.sendFile(
-        path.join(
-            __dirname,
-            "../frontend/index.html"
-        )
-    );
-
-}
-
+    }
 
 );
 
