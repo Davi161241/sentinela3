@@ -11,6 +11,11 @@
       "tipo": "medico"
     },
     {
+      "usuario": "admin",
+      "senha": "1234",
+      "tipo": "admin"
+    },
+    {
       "usuario": "atendimento",
       "senha": "1234",
       "tipo": "atendimento"
