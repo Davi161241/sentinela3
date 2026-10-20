@@ -1102,6 +1102,79 @@ app.get(
 
 );
 
+/* =====================================================
+   ADMINISTRAÇÃO DE USUÁRIOS
+   ===================================================== */
+
+// CADASTRAR USUÁRIO
+app.post("/usuarios", (req, res) => {
+    try {
+        const db = readDB();
+
+        const usuario = String(req.body.usuario || "").trim();
+        const senha = String(req.body.senha || "");
+        const tipo = String(req.body.tipo || "");
+
+        const tiposPermitidos = [
+            "atendimento",
+            "triagem",
+            "medico",
+            "admin"
+        ];
+
+        if (!usuario || !senha || !tipo) {
+            return res.status(400).json({
+                erro: "Preencha todos os campos."
+            });
+        }
+
+        if (!tiposPermitidos.includes(tipo)) {
+            return res.status(400).json({
+                erro: "Tipo de usuário inválido."
+            });
+        }
+
+        const usuarioExiste = db.usuarios.some(
+            u => u.usuario.toLowerCase() === usuario.toLowerCase()
+        );
+
+        if (usuarioExiste) {
+            return res.status(409).json({
+                erro: "Esse usuário já está cadastrado."
+            });
+        }
+
+        db.usuarios.push({
+            id: Date.now(),
+            usuario,
+            senha,
+            tipo
+        });
+
+        writeDB(db);
+
+        return res.status(201).json({
+            sucesso: true,
+            mensagem: "Usuário cadastrado com sucesso."
+        });
+
+    } catch (erro) {
+        console.error("Erro ao cadastrar usuário:", erro);
+
+        return res.status(500).json({
+            erro: "Erro interno ao cadastrar usuário."
+        });
+    }
+});
+
+// LOGOUT
+app.post("/logout", (req, res) => {
+    return res.json({
+        sucesso: true,
+        mensagem: "Logout realizado."
+    });
+});
+
 // =====================================================
 // ROTA PRINCIPAL
 // =====================================================
